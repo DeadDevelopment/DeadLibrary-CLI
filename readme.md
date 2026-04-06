@@ -113,8 +113,7 @@ DeadLibrary is a cloud-hosted service by [Dead Development LLC](https://deaddeve
 ### Free Trial
 
 ```bash
-npm install -g https://github.com/DeadDevelopment/DeadLibrary-CLI/releases/download/0.2.2/dead-development-deadlibrary-cli-0.2.2.tgz
-dead g "theme -n styles -d"
+npm install -g deadlibrary-cli
 ```
 
 Try all 20 commands free for 7 days — and see deterministic generation in action.

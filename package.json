@@ -1,7 +1,7 @@
 {
-  "name": "@dead-development/deadlibrary-cli",
-  "version": "0.2.2",
-  "description": "Generate Angular code.",
+  "name": "deadlibrary-cli",
+  "version": "0.2.3",
+  "description": "Deterministic Angular and Angular Material code generation CLI.",
   "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -37,5 +37,21 @@
   },
   "bin": {
     "dead": "./dist/index.js"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DeadDevelopment/DeadLibrary-CLI.git"
+  },
+  "homepage": "https://deaddevelopment.com/",
+  "keywords": [
+    "angular",
+    "angular-material",
+    "code-generation",
+    "cli",
+    "deterministic",
+    "scaffolding",
+    "developer-tools",
+    "ai-agent",
+    "claude-code"
+  ]
 }
