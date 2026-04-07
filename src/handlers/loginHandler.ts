@@ -15,7 +15,6 @@ const firebaseConfig = {
 export async function loginHandler(options: { email?: string; password?: string }) {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  auth.tenantId = process.env.CLI_TENANT_ID || "DeadLibraryCLI-jbnyb";
   
   let email = options.email;
   let password = options.password;
