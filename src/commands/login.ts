@@ -11,7 +11,7 @@ export function login(program: Command) {
       try {
         await loginHandler(options);
       } catch (error: any) {
-        console.error('Login failed:', error.message);
+        console.error('Login failed: ', error.message);
       }
     });
 }

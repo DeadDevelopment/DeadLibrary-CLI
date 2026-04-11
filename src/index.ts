@@ -2,7 +2,9 @@
 import { Command } from "commander";
 import chalk from 'chalk';
 import { g } from "./commands/g";
+import { demo } from "./commands/demo";
 import { login } from "./commands/login";
+import { signup } from "./commands/signup"
 import { ui } from "./utils/ui";
 
 const program = new Command();
@@ -10,7 +12,7 @@ const program = new Command();
 program
   .name('dead')
   .description('DeadLibrary CLI by Dead Development LLC.')
-  .version('0.2.4')
+  .version('0.3.1')
   .showSuggestionAfterError(true)
   .showHelpAfterError(ui.label('\nTip: run `dead g -h` for generator usage.\n'))
 
@@ -21,5 +23,7 @@ program.configureOutput({
 })
 
 g(program);
+demo(program);
 login(program);
+signup(program);
 program.parse(process.argv);

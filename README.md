@@ -93,37 +93,96 @@ Download `SKILL.md` from this repo and include it in your agent's system prompt 
 ---
 
 ## Quick Example
-
+ 
 **You say:**
 > "Build me a contact form with name, email, and message fields and a send button"
-
+ 
 **Your agent outputs:**
 ```
 dead g "fg -n contact-form -g contactGroup --language angular-20 -f [{"lbl":{"val":"Name"},"input":{"sel":"input","fieldType":"mat-input","required":true}},{"lbl":{"val":"Email"},"input":{"sel":"input","fieldType":"mat-input","inputType":"email","required":true,"validator":"Validators.email"}},{"lbl":{"val":"Message"},"input":{"sel":"mat-textarea","fieldType":"mat-textarea"}}] -b [{"lbl":"Send","type":"mat-flat-button","fn":"onSubmit()"}]"
 ```
-
+ 
 **DeadLibrary compiles:** A complete Angular component with FormGroup, reactive form controls, Material form fields, validation, and a submit handler. Correct. Every time.
-
+ 
 ---
-
+ 
 ## Getting Started with DeadLibrary
-
+ 
 DeadLibrary is a cloud-hosted service by [Dead Development LLC](https://deaddevelopment.com).
-
-### Free Trial
-
+ 
 ```bash
 npm install -g deadlibrary-cli
 ```
-
-Try all 20 commands free for 7 days — and see deterministic generation in action.
-
-### Subscribe
-
-**$50/month** unlocks all 20 commands with unlimited generations.
-
-→ [Start your free trial at deaddevelopment.com/pricing](https://deaddevelopment.com/pricing)
-
+ 
+### `dead demo` — Try without an account
+ 
+Run DeadLibrary instantly with no signup or authentication. Limited to three commands: `fg`, `gl`, and `theme`.
+ 
+```bash
+dead demo "fg -n contact-form -g contactGroup --language angular-20 -f [{\"lbl\":{\"val\":\"Name\"},\"input\":{\"sel\":\"input\",\"fieldType\":\"mat-input\",\"required\":true}}] -b [{\"lbl\":\"Send\",\"type\":\"mat-flat-button\",\"fn\":\"onSubmit()\"}]"
+```
+ 
+AI-assisted parsing is also available in demo mode:
+ 
+```bash
+dead demo "build a 3-column grid list with project cards" --ai gl
+```
+ 
+### `dead signup` — Create an account
+ 
+Create a Dead Development account directly from the CLI. No browser required.
+ 
+```bash
+dead signup -e you@example.com -p yourpassword
+```
+ 
+Or run `dead signup` interactively to be prompted for credentials. Optional flags: `-u` for username, `-c` for company name.
+ 
+### `dead login` — Authenticate
+ 
+Log in to an existing account.
+ 
+```bash
+dead login -e you@example.com -p yourpassword
+```
+ 
+### `dead subscribe` — Start your free trial
+ 
+Opens Stripe checkout in your browser to start a 7-day free trial. Requires an account (`dead signup` or `dead login` first).
+ 
+```bash
+dead subscribe
+```
+ 
+**$50/month** after trial. Unlocks all 20 commands with unlimited generations.
+ 
+### `dead g` — Generate code (subscribers)
+ 
+Full access to all 20 commands. Requires an active subscription or free trial.
+ 
+```bash
+dead g "b --language angular-20 -n submit-order -b [{\"lbl\":\"Place Order\",\"type\":\"mat-flat-button\",\"fn\":\"onSubmit()\"}]"
+```
+ 
+---
+ 
+## Quick Start for AI Agents
+ 
+An AI agent can get running with zero human interaction using `demo`:
+ 
+```bash
+dead demo "theme -n my-app --language angular-20 --primary #6200ee --accent #03dac6" --ai theme
+```
+ 
+For full access to all 20 commands, the agent (or its operator) can create an account and subscribe:
+ 
+```bash
+dead signup -e agent-owner@example.com -p securepassword
+dead subscribe
+# operator completes Stripe checkout in browser
+dead g "b --language angular-20 -n submit-order -b [{\"lbl\":\"Place Order\",\"type\":\"mat-flat-button\",\"fn\":\"onSubmit()\"}]"
+```
+ 
 ---
 
 ## How It Works

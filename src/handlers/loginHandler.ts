@@ -5,12 +5,7 @@ import path from 'path';
 import os from 'os';
 import prompts from 'prompts';
 import { ui } from '../utils/ui';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAUcSW-cPMiM3_iwhTEnDyEQCVo-9MhEzM",
-  authDomain: "deadlibrary-53c38.firebaseapp.com",
-  projectId: "deadlibrary-53c38",
-};
+import { firebaseConfig } from '../utils/shared';
 
 export async function loginHandler(options: { email?: string; password?: string }) {
   const app = initializeApp(firebaseConfig);

@@ -12,11 +12,40 @@ AI coding agents (Claude Code, Codex, Cursor, etc.) generate code probabilistica
 ## How do AI agents use it?
 Install the SKILL.md file from this repository into your agent's skill/context directory. The skill file teaches the agent how to translate natural language requests into valid DeadLibrary CLI commands. The agent generates the command string; DeadLibrary's cloud-hosted compiler generates the Angular code.
 
+## CLI Commands
+ 
+### demo — No account required
+Try DeadLibrary instantly. Limited to fg, gl, and theme commands.
+Usage: dead demo "<command-string>"
+Usage with AI: dead demo "<natural-language>" --ai <command>
+ 
+### signup — Create an account
+Usage: dead signup -e <email> -p <password>
+Optional flags: -u <username> -c <company>
+ 
+### login — Authenticate
+Usage: dead login -e <email> -p <password>
+ 
+### subscribe — Start 7-day free trial
+Opens Stripe checkout in the user's browser. Requires an account.
+Usage: dead subscribe
+ 
+### g — Generate code (subscribers)
+Full access to all 20 commands. Requires active subscription or trial.
+Usage: dead g "<command-string>"
+Usage with AI: dead g "<natural-language>" --ai <command>
+ 
+## Agent quick start
+Zero human interaction: dead demo "theme -n my-app --language angular-20 --primary #6200ee" --ai theme
+Full access: dead signup -e owner@example.com -p password → dead subscribe (operator completes checkout) → dead g "<command-string>"
+
 ## What can it generate?
 20 commands: content blocks, buttons, bottom modals, Material cards, carousels, expansion panels, form fields, form groups, grid lists, images, loading elements, lazy-loaded pages with routing, menus, popup modals, mobile toolbars, side navigation, Angular services, tabs, desktop toolbars, and complete customizable theme systems.
 
 ## Pricing
-7-day free trial to access all 20 commands, then $50/month for all 20 commands with unlimited generations.
+- Demo: Free, no account, limited to fg/gl/theme
+- Free trial: 7 days, all 20 commands, requires account + Stripe checkout
+- Subscription: $50/month, all 20 commands, unlimited generations
 
 ## Links
 - Skill file: SKILL.md (in this repository)
