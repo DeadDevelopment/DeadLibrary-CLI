@@ -12,7 +12,7 @@ const program = new Command();
 program
   .name('dead')
   .description('DeadLibrary CLI by Dead Development LLC.')
-  .version('0.3.1')
+  .version('0.3.2')
   .showSuggestionAfterError(true)
   .showHelpAfterError(ui.label('\nTip: run `dead g -h` for generator usage.\n'))
 
