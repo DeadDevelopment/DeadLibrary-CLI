@@ -1,6 +1,6 @@
 {
   "name": "deadlibrary-cli",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Deterministic Angular and Angular Material code generation CLI.",
   "main": "./dist/index.js",
   "scripts": {
@@ -24,7 +24,6 @@
     "chalk": "^4.1.2",
     "commander": "^14.0.1",
     "firebase": "^12.2.1",
-    "knip": "^6.1.1",
     "open": "^11.0.0",
     "ora": "^8.2.0",
     "prettier": "3.8.1",
@@ -33,6 +32,7 @@
   "devDependencies": {
     "@types/node": "^22.13.8",
     "@types/prompts": "^2.4.9",
+    "knip": "^6.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   },
