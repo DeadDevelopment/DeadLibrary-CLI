@@ -1,60 +1,84 @@
-import axios from 'axios';
 import { ERRORS } from '../utils/utils';
 import { ENDPOINTS } from '../utils/endpoints';
-import { writeGeneratedFiles } from '../utils/gWriter';
+import { writeAtomicFiles, writeMacroFiles } from '../utils/gWriter';
 import { getIdToken } from '../utils/auth';
 import { ui } from '../utils/ui';
 import ora from 'ora';
 
-export async function gHandler(raw: string, options: { ai?: string }) {
+export async function gHandler(
+  raw: string,
+  options: {
+    fileName?: string,
+    path?: string,
+    commandOrder?: number,
+    line?: number,
+    column?: number
+  }
+) {
+
+  // validate local flag combinations
+  if ((options.line !== undefined || options.column !== undefined) && options.commandOrder === undefined) {
+    console.error(ui.err('--commandOrder is required when using --line or --column.'));
+    return;
+  }
+
+  if (options.column !== undefined && options.line === undefined) {
+    console.error(ui.err('--line is required when using --column.'));
+    return;
+  }
+
   const start = Date.now();
-  const spinner = ora('Contacting DeadLibrary API…').start()
+  const spinner = ora('Calling DeadLibrary API...').start()
 
   async function callDeadLibraryAPI(forceRefresh = false) {
     const idToken = await getIdToken(forceRefresh);
 
     const payload: any = { raw };
-    if (typeof options.ai === "string") payload.useAI = options.ai;
 
-    /** set to gLocal for dev env */
-    return axios.post(
-      ENDPOINTS.g,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-          'Content-Type': 'application/json',
-        },
-        validateStatus: () => true,
-      }
-    );
+    return fetch(ENDPOINTS.g, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
   }
 
-  // 1st attempt
   let resp = await callDeadLibraryAPI(false);
 
-  // If 401, refresh token once and retry
   if (resp.status === 401) {
-    console.log(ui.warn('Status: 401, refreshing token…'));
+    console.log(ui.warn('Status: 401, refreshing token...'));
     resp = await callDeadLibraryAPI(true);
   }
 
-  // Log non-200 responses verbosely
   if (resp.status !== 200) {
     spinner.fail(ui.err(`DeadLibrary API Status: ${resp.status}`))
     console.error(ui.err(`Command syntax error.`))
     return
   }
 
-  // Success path
-  const data = resp.data;
+  const data = await resp.json();
 
   spinner.succeed(ui.ok(`DeadLibrary API Status: ${resp.status}`))
+  
 
   if (data?.writeInstructions) {
     const secs = ((Date.now() - start) / 1000).toFixed(2)
     console.log(ui.label(`Files prepared in ${secs}s`))
-    await writeGeneratedFiles(data.writeInstructions);
+
+    if (data.writeInstructions.mode === 'atomic') {
+      await writeAtomicFiles(data.writeInstructions, {
+        fileName: options.fileName,
+        path: options.path ?? './',
+        commandOrder: options.commandOrder,
+        line: options.line,
+        column: options.column,
+      });
+    } else {
+      await writeMacroFiles(data.writeInstructions);
+    }
+    
     return;
   }
   if (data?.help) {
@@ -63,3 +87,4 @@ export async function gHandler(raw: string, options: { ai?: string }) {
   }
   spinner.fail(ui.err(ERRORS.HANDLER_TRY))
 }
+

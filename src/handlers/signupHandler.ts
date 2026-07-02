@@ -79,7 +79,7 @@ export async function signupHandler(options: {
 
     console.log(ui.ok('Account created successfully!'));
     console.log(ui.label('You can now use `dead demo` to try DeadLibrary with gl, fg, and theme commands.'));
-    console.log(ui.label('When you\'re ready for full access, run `dead subscribe` to start your 7-day free trial.'));
+    console.log(ui.label('When you\'re ready for full access, run `dead subscribe` to start your 21-day free trial.'));
 
   } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {

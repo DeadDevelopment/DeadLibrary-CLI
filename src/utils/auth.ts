@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
 import os from "os";
-import axios from "axios";
 
 type Profile = { projectId: string; webApiKey: string; refreshToken: string };
 type AuthConfig = { profiles: Record<string, Profile>; current: string };
@@ -27,23 +26,25 @@ async function exchangeRefreshForIdToken(webApiKey: string, refreshToken: string
   });
 
   try {
-    const resp = await axios.post(url, body.toString(), {
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      validateStatus: () => true, // ← don't throw, let us inspect
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
     });
 
+    const data = await resp.json();
+
     if (resp.status !== 200) {
-      // Firebase typically returns: { error: { message: "INVALID_REFRESH_TOKEN" | ... } }
-      throw new Error(`SecureToken ${resp.status}: ${JSON.stringify(resp.data)}`);
+      throw new Error(`SecureToken ${resp.status}: ${JSON.stringify(data)}`);
     }
 
-    const idToken: string = resp.data.id_token;
-    const expiresInSec: number = parseInt(resp.data.expires_in, 10) || 3600;
+    const idToken: string = data.id_token;
+    const expiresInSec: number = parseInt(data.expires_in, 10) || 3600;
     const exp = Math.floor(Date.now() / 1000) + expiresInSec;
     return { idToken, exp };
   } catch (e: any) {
     const msg = e?.message || e?.toString?.() || 'secure token exchange failed';
-    throw new Error(`[auth] refresh→idToken failed: ${msg}`);
+    throw new Error(`[auth] refresh idToken failed: ${msg}`);
   }
 }
 
@@ -56,6 +57,3 @@ export async function getIdToken(forceRefresh = false): Promise<string> {
   cachedToken = { idToken, exp };
   return idToken;
 }
-
-
-

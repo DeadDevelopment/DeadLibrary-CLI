@@ -2,11 +2,11 @@ export const ERRORS = {
     HANDLER_TRY: 'Response indicated failure or missing result.'
 }
 
-const MSGS = {
-    SUCCESS: 'Done.'
-}
-
-export function sanitizeCodeString(content: string): string {
+export function sanitizeCodeString(content: string, language?: string): string {
+  if (language !== 'ts' && language !== 'js') {
+    return content.trim() + '\n';
+  }
+  
   return content
     // Break after semicolons followed by a non-whitespace character on the same line
     .replace(/;([^\n])/g, ';\n$1')

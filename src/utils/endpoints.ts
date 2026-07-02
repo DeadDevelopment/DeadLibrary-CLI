@@ -1,8 +1,6 @@
 import { config } from '../config/environment';
 
-const LOCAL_BASE_URL = "http://127.0.0.1:5001/deadlibrary-53c38/us-central1/"
-
 export const ENDPOINTS = {
-    g: config.apiEndpoint,
-    gLocal: `${LOCAL_BASE_URL}g`
+  g: config.apiEndpoint,
+  demo: config.demoEndpoint
 }

@@ -1,6 +1,6 @@
 {
   "name": "deadlibrary-cli",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Deterministic Angular and Angular Material code generation CLI.",
   "main": "./dist/index.js",
   "scripts": {
@@ -20,13 +20,16 @@
   "author": "Dead Development LLC",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "axios": "^1.15.0",
+    "@prettier/plugin-php": "^0.25.0",
+    "@wasm-fmt/gofmt": "^0.7.3",
     "chalk": "^4.1.2",
     "commander": "^14.0.1",
     "firebase": "^12.2.1",
     "open": "^11.0.0",
     "ora": "^8.2.0",
     "prettier": "3.8.1",
+    "prettier-plugin-java": "^2.10.1",
+    "prettier-plugin-rust": "^0.1.9",
     "prompts": "^2.4.2"
   },
   "devDependencies": {

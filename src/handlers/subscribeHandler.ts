@@ -1,9 +1,8 @@
-import axios from 'axios';
 import { getIdToken } from '../utils/auth';
 import { ui } from '../utils/ui';
 import ora from 'ora';
 
-const PRICE_ID = 'price_1S3n4xKXKNRCl8VuD7WycMX6';
+const PRICE_ID = 'price_1TnnjZKXKNRCl8VutrF5aR1U';
 const CREATE_SUBSCRIPTION_URL = 'https://us-central1-deadlibrary-53c38.cloudfunctions.net/createSubscription';
 
 export async function subscribeHandler() {
@@ -12,16 +11,16 @@ export async function subscribeHandler() {
   try {
     const idToken = await getIdToken();
 
-    const resp = await axios.post(CREATE_SUBSCRIPTION_URL, 
-      { priceId: PRICE_ID },
-      {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-          'Content-Type': 'application/json',
-        },
-        validateStatus: () => true,
-      }
-    );
+    const resp = await fetch(CREATE_SUBSCRIPTION_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ priceId: PRICE_ID }),
+    });
+
+    const data = await resp.json();
 
     if (resp.status === 401) {
       spinner.fail(ui.err('Not authenticated. Run `dead login` first.'));
@@ -29,11 +28,11 @@ export async function subscribeHandler() {
     }
 
     if (resp.status === 400) {
-      spinner.fail(ui.err(resp.data?.error || 'Subscription request failed.'));
+      spinner.fail(ui.err(data?.error || 'Subscription request failed.'));
       return;
     }
 
-    if (resp.status !== 200 || !resp.data?.checkoutUrl) {
+    if (resp.status !== 200 || !data?.checkoutUrl) {
       spinner.fail(ui.err('Failed to create checkout session.'));
       return;
     }
@@ -41,7 +40,7 @@ export async function subscribeHandler() {
     spinner.succeed(ui.ok('Checkout session created.'));
 
     const { default: open } = await import('open');
-    await open(resp.data.checkoutUrl);
+    await open(data.checkoutUrl);
 
     console.log(ui.label('Opening Stripe checkout in your browser...'));
     console.log(ui.label('After completing checkout, run `dead g` to start generating.'));
