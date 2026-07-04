@@ -4,6 +4,7 @@ import { writeAtomicFiles, writeMacroFiles } from '../utils/gWriter';
 import { getIdToken } from '../utils/auth';
 import { ui } from '../utils/ui';
 import ora from 'ora';
+import { renderApiError } from '../utils/shared';
 
 export async function gHandler(
   raw: string,
@@ -53,9 +54,10 @@ export async function gHandler(
   }
 
   if (resp.status !== 200) {
-    spinner.fail(ui.err(`DeadLibrary API Status: ${resp.status}`))
-    console.error(ui.err(`Command syntax error.`))
-    return
+    spinner.fail(ui.err(`DeadLibrary API Status: ${resp.status}`));
+    const data = await resp.json().catch(() => null);
+    renderApiError(data);
+    return;
   }
 
   const data = await resp.json();

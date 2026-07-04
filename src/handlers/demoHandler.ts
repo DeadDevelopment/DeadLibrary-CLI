@@ -1,5 +1,6 @@
 import { ENDPOINTS } from '../utils/endpoints';
 import { writeAtomicFiles, writeMacroFiles } from '../utils/gWriter';
+import { renderApiError } from '../utils/shared';
 import { ui } from '../utils/ui';
 import ora from 'ora';
 
@@ -40,7 +41,7 @@ export async function demoHandler(
 
   if (resp.status !== 200) {
     spinner.fail(ui.err(`DeadLibrary API Status [Demo]: ${resp.status}`));
-    console.error(ui.err(data?.error || 'Demo request failed.'));
+    renderApiError(data);
     return;
   }
 
