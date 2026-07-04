@@ -53,13 +53,38 @@ function getPrettierParser(language: string): string | null {
     case 'py': return null;
     case 'go': return null;
     case 'csharp': return null;
-    default: return 'typescript';
+    default: return null;
   }
 }
 
 export function getFileExtension(language: string, isTest: boolean): string {
   if (isTest) return testExtensionMap[language] ?? '.spec.ts';
   return extensionMap[language] ?? '.ts';
+}
+
+export async function formatWithParser(
+  content: string,
+  parser: prettier.BuiltInParserName | string,
+  plugins: any[] = [],
+): Promise<string> {
+  try {
+    const formatted = await prettier.format(content, {
+      parser,
+      plugins,
+      tabWidth: 2,
+      useTabs: false,
+      semi: true,
+      singleQuote: true,
+      printWidth: 100,
+      bracketSpacing: true,
+      arrowParens: 'always',
+      ...(parser === 'html' ? { htmlWhitespaceSensitivity: 'ignore' as const } : {}),
+    });
+    return formatted;
+  } catch (error) {
+    console.error(`Prettier formatting failed for parser "${parser}": `, error);
+    return content;
+  }
 }
 
 export async function formatContent(content: string, language: string): Promise<string> {
@@ -74,29 +99,11 @@ export async function formatContent(content: string, language: string): Promise<
   }
   
   const parser = getPrettierParser(language);
-
   if (!parser) return content;
 
   const plugins = [];
   if (parser === 'php') plugins.push(phpPlugin);
   if (parser === 'java') plugins.push(javaPlugin);
 
-  try {
-    const formatted = await prettier.format(content, {
-      parser,
-      plugins,
-      tabWidth: 2,
-      useTabs: false,
-      semi: true,
-      singleQuote: true,
-      printWidth: 100,
-      bracketSpacing: true,
-      arrowParens: 'always',
-    });
-    console.log('prettier is done.');
-    return formatted;
-  } catch (error) {
-    console.error(`Prettier formatting failed for parser "${parser}":`, error);
-    return content;
-  }
+  return formatWithParser(content, parser, plugins);
 }

@@ -1,6 +1,6 @@
 {
   "name": "deadlibrary-cli",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Deterministic Angular and Angular Material code generation CLI.",
   "main": "./dist/index.js",
   "scripts": {

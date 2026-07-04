@@ -2,7 +2,7 @@
 import { promises as fs } from 'fs'
 import * as path from 'path'
 import prettier from 'prettier';
-import { formatContent, formatWithSystemTool, getFileExtension } from './formatter'
+import { formatContent, formatWithParser, formatWithSystemTool, getFileExtension } from './formatter'
 import { ui } from './ui'
 import { sanitizeCodeString } from './utils'
 import { createHash } from 'crypto';
@@ -126,7 +126,7 @@ export async function writeMacroFiles(instructions: MacroWriteInstructions): Pro
     else if (fileType === 'styles') parserType = 'scss';
 
     if (parserType) {
-      cleanContent = await formatContent(cleanContent, parserType);
+      cleanContent = await formatWithParser(cleanContent, parserType);
     }
 
     await fs.writeFile(filePath, cleanContent, 'utf8');
