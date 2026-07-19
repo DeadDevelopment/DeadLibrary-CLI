@@ -98,7 +98,7 @@ These flags are used with artifact commands only. They are handled by the CLI lo
 |------|-------------|
 | `-f, --fileName <string>` | [Required] Target output file name (without extension). |
 | `-p, --path <string>` | Output directory path. Defaults to current directory. |
-| `-o, --commandOrder <number>` | Insert position in the file's command manifest. Omit to append to end of file. |
+| `-o, --commandOrder <number>` | Target position in the file's command manifest. If an entry already exists at this position, it is replaced. If not, a new entry is inserted. Omit to append to end of file. |
 | `-l, --line <number>` | Target line number for injection. Required if `-c` is used. |
 | `-c, --column <number>` | Target column number for injection at value of `-l`. |
 
@@ -131,6 +131,13 @@ Use `-o` to insert at a specific position. Omit `-o` to append at the end.
 ### Drift Detection
 
 If a file has been modified outside of DeadLibrary (hand edits, another tool, a merge), the CLI detects the hash mismatch and prompts before rebuilding. The user can cancel to preserve their changes or proceed to rebuild from the command history.
+
+### Artifact Command Replacement
+
+When you rerun a command with `-o` targeting a position that already has an entry in the manifest, the CLI replaces the old entry rather than inserting a duplicate. The file is reassembled from the updated manifest and reformatted. This is how you edit existing code managed by DeadLibrary: change the command options, pass the same `-o` position, and the old output is replaced with the new compilation.
+
+Example: change a function signature at position 2:
+dead g 'f -n validateEmail --language ts -e -p [{"name":"email","type":"string"},{"name":"strict","type":"boolean"}] -r boolean' -f helpers -o 2
 
 ---
 

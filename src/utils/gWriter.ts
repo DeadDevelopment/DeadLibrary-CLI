@@ -8,7 +8,6 @@ import { sanitizeCodeString } from './utils'
 import { createHash } from 'crypto';
 import prompts from 'prompts';
 
-// NEW
 interface MacroFile {
   name: string,
   content: string,
@@ -206,67 +205,87 @@ export async function writeAtomicFiles(instructions: AtomicWriteInstructions, op
         }
       }
 
-      // line/column injection: insert into file as-is
+      // line/column injection: new inserts only, replacement falls through to reassembly
       if (options.line !== undefined) {
-        const currentContent = await fs.readFile(targetPath, 'utf8');
-        const lines = currentContent.split('\n');
-        const lineIndex = options.line - 1;
-        const col = options.column ?? 0;
+        const existingLineIndex = manifest.entries.findIndex(e => e.position === options.commandOrder!);
 
-        if (lineIndex < 0 || lineIndex > lines.length) {
-          console.error(ui.err(`Line ${options.line} is greater than file lines value. File has ${lines.length} lines.`));
+        if (existingLineIndex === -1) {
+          // new insertion at line/column
+          const currentContent = await fs.readFile(targetPath, 'utf8');
+          const lines = currentContent.split('\n');
+          const lineIndex = options.line - 1;
+          const col = options.column ?? 0;
+
+          if (lineIndex <0 || lineIndex > lines.length) {
+            console.error(ui.err(`Line ${options.line} is greater than file lines value. File has ${lines.length} lines.`));
+            return;
+          }
+
+          const targetLine = lines[lineIndex] ?? '';
+          lines[lineIndex] = targetLine.slice(0, col) + sanitizedFragment + targetLine.slice(col);
+
+          const assembled = lines.join('\n');
+          let formatted = await formatContent(assembled, instructions.language);
+
+          await fs.writeFile(targetPath, formatted, 'utf8');
+
+          if (formatWithSystemTool(targetPath, instructions.language)) {
+            formatted = await fs.readFile(targetPath, 'utf8');
+          }
+
+          for (const entry of manifest.entries) {
+            if (entry.position >= options.commandOrder!) {
+              entry.position++;
+            }
+          }
+
+          manifest.entries.push({
+            raw: instructions.raw,
+            position: options.commandOrder!,
+            fragment: sanitizedFragment,
+          });
+
+          manifest.hash = hashContent(formatted);
+          await writeManifest(manifestPath, manifest);
+          await writeDeadCommandFile(deadCmdsFilePath, manifest.entries);
+
+          const bytes = Buffer.byteLength(formatted, 'utf8');
+          console.log(`${ui.dim('write: ')} ${ui.label(targetPath)} ${ui.dim(`(${bytes} B)`)}`);
           return;
         }
 
-        const targetLine = lines[lineIndex] ?? '';
-        lines[lineIndex] = targetLine.slice(0, col) + sanitizedFragment + targetLine.slice(col);
-
-        const assembled = lines.join('\n');
-        let formatted = await formatContent(assembled, instructions.language);
-
-        await fs.writeFile(targetPath, formatted, 'utf8');
-
-        if (formatWithSystemTool(targetPath, instructions.language)) {
-          formatted = await fs.readFile(targetPath, 'utf8');
-        }
-
-        // increment positions of existing entries at or after insertion
-        for (const entry of manifest.entries) {
-          if (entry.position >= options.commandOrder!) {
-            entry.position++;
-          }
-        }
-
-        manifest.entries.push({
+        // existing manifest at this position: swap and fall through to reassembly
+        manifest.entries[existingLineIndex] = {
           raw: instructions.raw,
           position: options.commandOrder!,
           fragment: sanitizedFragment
-        });
-
-        manifest.hash = hashContent(formatted);
-        await writeManifest(manifestPath, manifest);
-        await writeDeadCommandFile(deadCmdsFilePath, manifest.entries);
-
-        const bytes = Buffer.byteLength(formatted, 'utf8');
-        console.log(`${ui.dim('write: ')} ${ui.label(targetPath)} ${ui.dim(`(${bytes} B)`)}`);
-        return;
+        };
       }
 
-      // Insert at position or append
-      const position = options.commandOrder ?? manifest.entries.length;
+      // Replace at position or append
+      if (!options.line) {
+        const position = options.commandOrder ?? manifest.entries.length;
+        const existingIndex = manifest.entries.findIndex(e => e.position === position);
 
-      // Increment positions of entries at or after the insertion point.
-      for (const entry of manifest.entries) {
-        if (entry.position >= position) {
-          entry.position++;
+        if (existingIndex !== -1) {
+          manifest.entries[existingIndex] = {
+            raw: instructions.raw,
+            position,
+            fragment: sanitizedFragment,
+          };
+        } else {
+          for (const entry of manifest.entries) {
+            if (entry.position >= position) {
+              entry.position++;
+            }
+          }
+          manifest.entries.push({
+            raw: instructions.raw,
+            position,
+            fragment: sanitizedFragment,
+          });
         }
       }
-
-      manifest.entries.push({
-        raw: instructions.raw,
-        position,
-        fragment: sanitizedFragment,
-      });
 
       // reassemble from all fragments in order
       const assembled = manifest.entries
